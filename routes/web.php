@@ -14,5 +14,5 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return 'Welcome to Finance Tracker API.';
+    return response()->json('Welcome to Finance Tracker API.');
 });
