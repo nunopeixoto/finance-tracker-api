@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Controllers\PortfoliosController;
+use App\Http\Controllers\ExpensesController;
+use App\Http\Controllers\ExpenseCategoriesController;
+use App\Http\Controllers\ExpenseSubCategoriesController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,9 +24,14 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+//Add namespace to avoid all the imports
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('/user', UserController::class);
+    Route::resource('portfolio', PortfoliosController::class);
+    Route::resource('expense', ExpensesController::class);
+    Route::resource('expense-categories', ExpenseCategoriesController::class);
+    Route::resource('expense-sub-categories', ExpenseSubCategoriesController::class);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
