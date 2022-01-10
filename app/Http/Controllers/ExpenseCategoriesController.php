@@ -13,7 +13,7 @@ class ExpenseCategoriesController extends Controller
     {
         $categories = $this->model::queryUser(auth()->user()->id)
             ->get();
-        return response()->json([$categories]);
+        return response()->json($categories);
     }
 
     public function store(Request $request)
