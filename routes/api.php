@@ -29,7 +29,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('/user', UserController::class);
     Route::resource('portfolio', PortfoliosController::class);
-    Route::resource('expense', ExpensesController::class);
+    Route::resource('expenses', ExpensesController::class);
     Route::resource('expense-categories', ExpenseCategoriesController::class);
     Route::resource('expense-sub-categories', ExpenseSubCategoriesController::class);
     Route::post('/logout', [AuthController::class, 'logout']);
