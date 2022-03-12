@@ -16,13 +16,40 @@ class AuthControllerTest extends TestCase
      */
     public function test_auth_register()
     {
+        // OK
         $response = $this->post('/api/register', [
             'name' => 'John Doe',
             'email' => 'johndoe@gmail.com',
             'password' => 'a cool password',
             'password_confirmation' => 'a cool password'
         ]);
-
         $response->assertStatus(201);
+
+        // Duplicate e-mail
+        $response = $this->post('/api/register', [
+            'name' => 'John Doe',
+            'email' => 'johndoe@gmail.com',
+            'password' => 'a cool password',
+            'password_confirmation' => 'a cool password'
+        ]);
+        $response->assertSessionHasErrors(['email']);
+
+        // Password doesen't match
+        $response = $this->post('/api/register', [
+            'name' => 'Johana Doe',
+            'email' => 'johanadoe@gmail.com',
+            'password' => 'a cool password',
+            'password_confirmation' => 'another cool password'
+        ]);
+        $response->assertSessionHasErrors(['password']);
+
+        // Empty name
+        $response = $this->post('/api/register', [
+            'name' => '',
+            'email' => 'johanadoe@gmail.com',
+            'password' => 'a cool password',
+            'password_confirmation' => 'a cool password'
+        ]);
+        $response->assertSessionHasErrors(['name']);
     }
 }
