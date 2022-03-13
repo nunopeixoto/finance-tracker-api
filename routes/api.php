@@ -32,9 +32,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('expenses', ExpensesController::class);
     Route::resource('expense-categories', ExpenseCategoriesController::class);
     Route::resource('expense-sub-categories', ExpenseSubCategoriesController::class);
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('logout', [AuthController::class, 'logout']);
 });
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
