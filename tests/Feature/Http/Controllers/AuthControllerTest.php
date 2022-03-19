@@ -3,7 +3,6 @@
 namespace Tests\Feature\Http\Controllers;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use Laravel\Sanctum\Sanctum;
@@ -11,11 +10,7 @@ use Laravel\Sanctum\Sanctum;
 class AuthControllerTest extends TestCase
 {
     use RefreshDatabase;
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
+
     public function test_register() : void
     {
         // OK
