@@ -19,8 +19,9 @@ class ExpenseCategoriesController extends Controller
     public function store(Request $request)
     {
         $user = $request->user();
+        $tableToCheck = (new $this->model)->getTable();
         $validated = $request->validate([
-            'description' => 'required|max:200|unique:expense_categories,description'
+            'description' => "required|max:200|unique:$tableToCheck,description"
         ]);
 
         $category = $this->model::create([
@@ -52,8 +53,9 @@ class ExpenseCategoriesController extends Controller
             abort(404);
         }
 
+        $tableToCheck = (new $this->model)->getTable();
         $validated = $request->validate([
-            'description' => 'required|max:200|unique:expense_categories,description'
+            'description' => "required|max:200|unique:$tableToCheck,description"
         ]);
 
         $category->description = $validated['description'];
