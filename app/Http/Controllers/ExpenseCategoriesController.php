@@ -8,7 +8,7 @@ class ExpenseCategoriesController extends Controller
 {
 
     protected $model = 'App\Models\ExpenseCategory';
-    
+
     public function index()
     {
         $categories = $this->model::queryUser(auth()->user()->id)
@@ -28,14 +28,14 @@ class ExpenseCategoriesController extends Controller
             'description' => $validated['description']
         ]);
 
-        return response()->json($category);
+        return response($category, 201);
     }
 
     public function show($id)
     {
         $category = $this->model::queryUser(auth()->user()->id)
             ->find($id);
-        
+
         if ($category === null) {
             abort(404);
         }
@@ -47,7 +47,7 @@ class ExpenseCategoriesController extends Controller
     {
         $category = $this->model::queryUser(auth()->user()->id)
             ->find($id);
-    
+
         if ($category === null) {
             abort(404);
         }
@@ -66,7 +66,7 @@ class ExpenseCategoriesController extends Controller
     {
         $category = $this->model::queryUser(auth()->user()->id)
             ->find($id);
-        
+
         if ($category === null) {
             abort(404);
         }
