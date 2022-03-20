@@ -30,6 +30,16 @@ class Expense extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function category()
+    {
+        return $this->hasOne(ExpenseCategory::class);
+    }
+
+    public function subCategory()
+    {
+        return $this->hasOne(ExpenseSubCategory::class);
+    }
+
     public function scopeQueryUser(Builder $query, int $userId) : Builder
     {
         return $query->where('user_id', $userId);
