@@ -8,7 +8,7 @@ class ExpenseCategoriesController extends Controller
 {
 
     protected $model = 'App\Models\ExpenseCategory';
-    
+
     public function index()
     {
         $categories = $this->model::queryUser(auth()->user()->id)
@@ -19,8 +19,9 @@ class ExpenseCategoriesController extends Controller
     public function store(Request $request)
     {
         $user = $request->user();
+        $tableToCheck = (new $this->model)->getTable();
         $validated = $request->validate([
-            'description' => 'required|max:200|unique:expense_categories,description'
+            'description' => "required|max:200|unique:$tableToCheck,description"
         ]);
 
         $category = $this->model::create([
@@ -28,14 +29,14 @@ class ExpenseCategoriesController extends Controller
             'description' => $validated['description']
         ]);
 
-        return response()->json($category);
+        return response($category, 201);
     }
 
     public function show($id)
     {
         $category = $this->model::queryUser(auth()->user()->id)
             ->find($id);
-        
+
         if ($category === null) {
             abort(404);
         }
@@ -47,13 +48,14 @@ class ExpenseCategoriesController extends Controller
     {
         $category = $this->model::queryUser(auth()->user()->id)
             ->find($id);
-    
+
         if ($category === null) {
             abort(404);
         }
 
+        $tableToCheck = (new $this->model)->getTable();
         $validated = $request->validate([
-            'description' => 'required|max:200|unique:expense_categories,description'
+            'description' => "required|max:200|unique:$tableToCheck,description"
         ]);
 
         $category->description = $validated['description'];
@@ -66,7 +68,7 @@ class ExpenseCategoriesController extends Controller
     {
         $category = $this->model::queryUser(auth()->user()->id)
             ->find($id);
-        
+
         if ($category === null) {
             abort(404);
         }

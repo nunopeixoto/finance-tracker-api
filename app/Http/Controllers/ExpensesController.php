@@ -36,14 +36,14 @@ class ExpensesController extends Controller
             'amount' => $validated['amount']
         ]);
 
-        return response()->json($expense);
+        return response($expense, 201);
     }
 
     public function show($id)
     {
         $expense = Expense::queryUser(auth()->user()->id)
             ->find($id);
-        
+
         if ($expense === null) {
             abort(404);
         }
@@ -53,9 +53,10 @@ class ExpensesController extends Controller
 
     public function update(Request $request, $id)
     {
-        $expense = Expense::queryUser(auth()->user()->id)
+        $userId = auth()->user()->id;
+        $expense = Expense::queryUser($userId)
             ->find($id);
-    
+
         if ($expense === null) {
             abort(404);
         }
@@ -63,10 +64,10 @@ class ExpensesController extends Controller
         $validated = $request->validate([
             'date' => 'date',
             'description' => 'string|max:200',
-            'expense_category_id' => 'exists:expense_category',
-            'expense_sub_category_id' => 'exists:expense_sub_category',
+            'expense_category_id' => "exists:expense_categories,id,user_id,$userId",
+            'expense_sub_category_id' => "exists:expense_sub_categories,id,user_id,$userId",
             'note' => 'string|max:200',
-            'amount' => 'number'
+            'amount' => 'numeric'
         ]);
 
         $expense->update($validated);
@@ -79,7 +80,7 @@ class ExpensesController extends Controller
     {
         $expense = Expense::queryUser(auth()->user()->id)
             ->find($id);
-        
+
         if ($expense === null) {
             abort(404);
         }
