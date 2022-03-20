@@ -83,9 +83,7 @@ class ExpenseSubCategoriesControllerTest extends TestCase
     public function test_show()
     {
         // No auth
-        $response = $this->get('/api/expense-sub-categories/1', [
-            'description' => 'mycategory'
-        ]);;
+        $response = $this->get('/api/expense-sub-categories/1');
         $response->assertStatus(401);
 
         $user = User::factory()->create();
