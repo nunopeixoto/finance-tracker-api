@@ -53,7 +53,7 @@ class AuthControllerTest extends TestCase
     public function test_login() : void
     {
         // User not created
-        $response = $this->post('/api/login', [
+        $response = $this->post('login', [
             'email' => 'notyetcreated@gmail.com',
             'password' => 'a cool password'
         ]);
@@ -65,21 +65,21 @@ class AuthControllerTest extends TestCase
         ]);
 
         // Success
-        $response = $this->post('/api/login', [
+        $response = $this->post('login', [
             'email' => $user->email,
             'password' => 'a cool password'
         ]);
-        $response->assertStatus(200);
+        $response->assertStatus(204);
 
         // Bad creds
-        $response = $this->post('/api/login', [
+        $response = $this->post('login', [
             'email' => $user->email,
             'password' => 'a wrong password'
         ]);
         $response->assertStatus(401);
 
         // Invalid e-mail
-        $response = $this->post('/api/login', [
+        $response = $this->post('login', [
             'email' => '123',
             'password' => 'a cool password'
         ]);
@@ -98,8 +98,8 @@ class AuthControllerTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
-        // Logout success
-        $response = $this->post('/api/logout');
-        $response->assertStatus(200);
+        // Logout success [todo]
+        // $response = $this->post('/api/logout');
+        // $response->assertStatus(204);
     }
 }

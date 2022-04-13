@@ -20,9 +20,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-// Public routes
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
 
 //Add namespace to avoid all the imports
 // Protected routes
