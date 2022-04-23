@@ -45,7 +45,6 @@ class ExpenseCategoriesControllerTest extends TestCase
         $response->assertExactJson([
             [
                 'id' => $expenseCategory->id,
-                'user_id' => $user->id,
                 'description' => $expenseCategory->description
             ]
         ]);
@@ -109,7 +108,6 @@ class ExpenseCategoriesControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertExactJson([
             'id' => $expenseCategory->id,
-            'user_id' => $user->id,
             'description' => $expenseCategory->description
         ]);
     }

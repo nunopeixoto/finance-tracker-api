@@ -3,8 +3,9 @@
 namespace Database\Factories;
 
 use App\Models\ExpenseSubCategory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-class ExpenseSubCategoryFactory extends ExpenseCategoryFactory
+class ExpenseSubCategoryFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.

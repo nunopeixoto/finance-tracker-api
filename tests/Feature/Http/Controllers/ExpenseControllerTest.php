@@ -6,11 +6,9 @@ use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\ExpenseSubCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use Laravel\Sanctum\Sanctum;
-use Illuminate\Support\Carbon;
 
 class ExpenseControllerTest extends TestCase
 {
@@ -39,11 +37,13 @@ class ExpenseControllerTest extends TestCase
         $response->assertJson([]);
 
         // OK
+        $category = ExpenseCategory::factory()->for($user)->create();
+        $subCategory = ExpenseSubCategory::factory()->for($user)->create();
         $expense = Expense::factory()
             ->for($user)
             ->create([
-                'expense_category_id' => ExpenseCategory::factory()->for($user),
-                'expense_sub_category_id' => ExpenseSubCategory::factory()->for($user)
+                'expense_category_id' => $category->id,
+                'expense_sub_category_id' => $subCategory->id
             ])
         ;
         $anotherUser = User::factory()->create();
@@ -57,18 +57,24 @@ class ExpenseControllerTest extends TestCase
 
         $response = $this->get('/api/expenses');
         $response->assertStatus(200);
+
         $response->assertExactJson([
             [
                 'id' => $expense->id,
-                'user_id' => $expense->user_id,
                 'date' => $expense->date->format('Y-m-d H:i:s'),
                 'description' => $expense->description,
-                'expense_category_id' => $expense->expense_category_id,
-                'expense_sub_category_id' => $expense->expense_sub_category_id,
+                'category' => [
+                    'id' => $category->id,
+                    'user_id' => $category->user_id,
+                    'description' => $category->description
+                ],
+                'subCategory' => [
+                    'id' => $subCategory->id,
+                    'user_id' => $subCategory->user_id,
+                    'description' => $subCategory->description
+                ],
                 'note' => $expense->note,
-                'amount' => (string) number_format($expense->amount, 2),
-                'created_at' => $expense->created_at,
-                'updated_at' => $expense->updated_at,
+                'amount' => (float) number_format($expense->amount, 2),
             ]
         ]);
     }
@@ -88,8 +94,8 @@ class ExpenseControllerTest extends TestCase
         $response = $this->post('/api/expenses', [
             'description' => 'Padel',
             'date' => '2021-01-01',
-            'expense_category_id' => $expenseCategory->id,
-            'expense_sub_category_id' => $expenseSubCategory->id,
+            'expenseCategoryId' => $expenseCategory->id,
+            'expenseSubCategoryId' => $expenseSubCategory->id,
             'note' => 'A note',
             'amount' => 30
         ]);
@@ -109,13 +115,13 @@ class ExpenseControllerTest extends TestCase
         $response = $this->post('/api/expenses', [
             'description' => 'Padel',
             'date' => '2021-01-01',
-            'expense_category_id' => 2,
-            'expense_sub_category_id' => $expenseSubCategory->id,
+            'expenseCategoryId' => 2,
+            'expenseSub_categoryId' => $expenseSubCategory->id,
             'note' => 'A note',
             'amount' => 30
         ]);
         $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['expense_category_id']);
+        $response->assertJsonValidationErrors(['expenseCategoryId']);
     }
 
     public function test_show()
@@ -126,11 +132,13 @@ class ExpenseControllerTest extends TestCase
 
         $user = User::factory()->create();
         Sanctum::actingAs($user);
+        $category = ExpenseCategory::factory()->for($user)->create();
+        $subCategory = ExpenseSubCategory::factory()->for($user)->create();
         $expense = Expense::factory()
             ->for($user)
             ->create([
-                'expense_category_id' => ExpenseCategory::factory()->for($user),
-                'expense_sub_category_id' => ExpenseSubCategory::factory()->for($user)
+                'expense_category_id' => $category->id,
+                'expense_sub_category_id' => $subCategory->id
             ])
         ;
 
@@ -152,15 +160,20 @@ class ExpenseControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertExactJson([
             'id' => $expense->id,
-            'user_id' => $expense->user_id,
             'date' => $expense->date->format('Y-m-d H:i:s'),
             'description' => $expense->description,
-            'expense_category_id' => $expense->expense_category_id,
-            'expense_sub_category_id' => $expense->expense_sub_category_id,
+            'category' => [
+                'id' => $category->id,
+                'user_id' => $category->user_id,
+                'description' => $category->description
+            ],
+            'subCategory' => [
+                'id' => $subCategory->id,
+                'user_id' => $subCategory->user_id,
+                'description' => $subCategory->description
+            ],
             'note' => $expense->note,
-            'amount' => (string) number_format($expense->amount, 2),
-            'created_at' => $expense->created_at,
-            'updated_at' => $expense->updated_at,
+            'amount' => (float) number_format($expense->amount, 2),
         ]);
     }
 
@@ -214,10 +227,10 @@ class ExpenseControllerTest extends TestCase
         $response->assertJsonValidationErrors(['amount']);
 
         $response = $this->patch("/api/expenses/$expense->id", [
-            'expense_category_id' => ExpenseCategory::factory()->for($anotherUser)->create()->id
+            'expenseCategoryId' => ExpenseCategory::factory()->for($anotherUser)->create()->id
         ]);
         $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['expense_category_id']);
+        $response->assertJsonValidationErrors(['expenseCategoryId']);
     }
 
     public function test_destroy()
@@ -250,6 +263,5 @@ class ExpenseControllerTest extends TestCase
         Sanctum::actingAs($user);
         $response = $this->delete("/api/expenses/$expense->id");
         $response->assertStatus(200);
-
     }
 }

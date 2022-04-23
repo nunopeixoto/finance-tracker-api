@@ -32,12 +32,12 @@ class Expense extends Model
 
     public function category()
     {
-        return $this->hasOne(ExpenseCategory::class);
+        return $this->hasOne(ExpenseCategory::class, 'id', 'expense_category_id');
     }
 
     public function subCategory()
     {
-        return $this->hasOne(ExpenseSubCategory::class);
+        return $this->hasOne(ExpenseSubCategory::class, 'id', 'expense_sub_category_id');
     }
 
     public function scopeQueryUser(Builder $query, int $userId) : Builder

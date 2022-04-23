@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Resources\ExpenseCategoryResource;
 
 class ExpenseCategoriesController extends Controller
 {
@@ -13,7 +14,9 @@ class ExpenseCategoriesController extends Controller
     {
         $categories = $this->model::queryUser(auth()->user()->id)
             ->get();
-        return response()->json($categories);
+
+        $resources = ExpenseCategoryResource::collection($categories);
+        return response()->json($resources);
     }
 
     public function store(Request $request)
@@ -29,7 +32,7 @@ class ExpenseCategoriesController extends Controller
             'description' => $validated['description']
         ]);
 
-        return response($category, 201);
+        return response(new ExpenseCategoryResource($category), 201);
     }
 
     public function show($id)
@@ -41,7 +44,7 @@ class ExpenseCategoriesController extends Controller
             abort(404);
         }
 
-        return response()->json($category);
+        return response()->json(new ExpenseCategoryResource($category));
     }
 
     public function update(Request $request, $id)
@@ -61,7 +64,7 @@ class ExpenseCategoriesController extends Controller
         $category->description = $validated['description'];
         $category->save();
 
-        return response()->json($category);
+        return response()->json(new ExpenseCategoryResource($category));
     }
 
     public function destroy($id)

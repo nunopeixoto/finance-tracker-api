@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ExpenseResource;
 use Illuminate\Http\Request;
 use App\Models\Expense;
 
@@ -9,9 +10,12 @@ class ExpensesController extends Controller
 {
     public function index()
     {
-        $expenses = Expense::queryUser(auth()->user()->id)
+        $expenses = Expense::with(['category', 'subCategory'])
+            ->queryUser(auth()->user()->id)
             ->get();
-        return response()->json($expenses);
+
+        $resources = ExpenseResource::collection($expenses);
+        return response()->json($resources);
     }
 
     public function store(Request $request)
@@ -20,8 +24,8 @@ class ExpensesController extends Controller
         $validated = $request->validate([
             'date' => 'required|date',
             'description' => 'required|string|max:200',
-            'expense_category_id' => 'required|exists:expense_categories,id',
-            'expense_sub_category_id' => 'required|exists:expense_sub_categories,id',
+            'expenseCategoryId' => 'required|exists:expense_categories,id',
+            'expenseSubCategoryId' => 'required|exists:expense_sub_categories,id',
             'note' => 'required|string|max:200',
             'amount' => 'required|numeric'
         ]);
@@ -30,13 +34,13 @@ class ExpensesController extends Controller
             'user_id' => $user->id,
             'description' => $validated['description'],
             'date' => $validated['date'],
-            'expense_category_id' => $validated['expense_category_id'],
-            'expense_sub_category_id' => $validated['expense_sub_category_id'],
+            'expense_category_id' => $validated['expenseCategoryId'],
+            'expense_sub_category_id' => $validated['expenseSubCategoryId'],
             'note' => $validated['note'],
             'amount' => $validated['amount']
         ]);
 
-        return response($expense, 201);
+        return response(new ExpenseResource($expense), 201);
     }
 
     public function show($id)
@@ -48,7 +52,7 @@ class ExpensesController extends Controller
             abort(404);
         }
 
-        return response()->json($expense);
+        return response()->json(new ExpenseResource($expense));
     }
 
     public function update(Request $request, $id)
@@ -64,8 +68,8 @@ class ExpensesController extends Controller
         $validated = $request->validate([
             'date' => 'date',
             'description' => 'string|max:200',
-            'expense_category_id' => "exists:expense_categories,id,user_id,$userId",
-            'expense_sub_category_id' => "exists:expense_sub_categories,id,user_id,$userId",
+            'expenseCategoryId' => "exists:expense_categories,id,user_id,$userId",
+            'expenseSubCategoryId' => "exists:expense_sub_categories,id,user_id,$userId",
             'note' => 'string|max:200',
             'amount' => 'numeric'
         ]);
@@ -73,7 +77,7 @@ class ExpensesController extends Controller
         $expense->update($validated);
         $expense->save();
 
-        return response()->json($expense);
+        return response()->json(new ExpenseResource($expense));
     }
 
     public function destroy($id)
