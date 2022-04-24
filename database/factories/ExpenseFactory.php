@@ -21,11 +21,13 @@ class ExpenseFactory extends Factory
      */
     public function definition()
     {
+        $rand = rand(0, 1);
         return [
             'description' => $this->faker->name(),
             'date' => $this->faker->dateTime(),
             'note' => $this->faker->name(),
-            'amount' => $this->faker->randomFloat(2, 0, 10)
+            'debit' => $rand ?  $this->faker->randomFloat(2, 0, 10) : null,
+            'credit' =>  $rand ? null : $this->faker->randomFloat(2, 0, 10)
         ];
     }
 }
