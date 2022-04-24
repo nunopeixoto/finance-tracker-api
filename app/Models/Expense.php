@@ -22,7 +22,8 @@ class Expense extends Model
         'expense_category_id',
         'expense_sub_category_id',
         'note',
-        'amount'
+        'debit',
+        'credit'
     ];
 
     public function user()

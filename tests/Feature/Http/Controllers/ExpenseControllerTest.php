@@ -74,7 +74,8 @@ class ExpenseControllerTest extends TestCase
                     'description' => $subCategory->description
                 ],
                 'note' => $expense->note,
-                'amount' => (float) number_format($expense->amount, 2),
+                'type' => $expense->debit ? 'debit' : 'credit',
+                'amount' => $expense->debit ? (float) number_format($expense->debit, 2): (float) number_format($expense->credit, 2),
             ]
         ]);
     }
@@ -97,7 +98,8 @@ class ExpenseControllerTest extends TestCase
             'expenseCategoryId' => $expenseCategory->id,
             'expenseSubCategoryId' => $expenseSubCategory->id,
             'note' => 'A note',
-            'amount' => 30
+            'type' => 'debit',
+            'amount' => 30,
         ]);
         $response->assertStatus(201);
         $this->assertEquals(1, Expense::count()); // we only have one category
@@ -109,7 +111,8 @@ class ExpenseControllerTest extends TestCase
         $this->assertEquals($expenseCategory->id, $expense->expense_category_id);
         $this->assertEquals($expenseSubCategory->id, $expense->expense_sub_category_id);
         $this->assertEquals('A note', $expense->note);
-        $this->assertEquals('30.00', $expense->amount);
+        $this->assertEquals('30.00', $expense->debit);
+        $this->assertEquals(null, $expense->credit);
 
         // Invalid expense category
         $response = $this->post('/api/expenses', [
@@ -118,6 +121,7 @@ class ExpenseControllerTest extends TestCase
             'expenseCategoryId' => 2,
             'expenseSub_categoryId' => $expenseSubCategory->id,
             'note' => 'A note',
+            'type' => 'debit',
             'amount' => 30
         ]);
         $response->assertStatus(422);
@@ -173,7 +177,8 @@ class ExpenseControllerTest extends TestCase
                 'description' => $subCategory->description
             ],
             'note' => $expense->note,
-            'amount' => (float) number_format($expense->amount, 2),
+            'type' => $expense->debit ? 'debit' : 'credit',
+            'amount' => $expense->debit ? (float) number_format($expense->debit, 2) : (float) number_format($expense->credit, 2),
         ]);
     }
 

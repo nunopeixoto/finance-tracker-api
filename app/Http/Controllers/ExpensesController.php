@@ -27,6 +27,7 @@ class ExpensesController extends Controller
             'expenseCategoryId' => 'required|exists:expense_categories,id',
             'expenseSubCategoryId' => 'required|exists:expense_sub_categories,id',
             'note' => 'required|string|max:200',
+            'type' => 'required|string|in:debit,credit',
             'amount' => 'required|numeric'
         ]);
 
@@ -37,7 +38,8 @@ class ExpensesController extends Controller
             'expense_category_id' => $validated['expenseCategoryId'],
             'expense_sub_category_id' => $validated['expenseSubCategoryId'],
             'note' => $validated['note'],
-            'amount' => $validated['amount']
+            'debit' => $validated['type'] === 'debit' ? $validated['amount'] : null,
+            'credit' => $validated['type'] === 'credit' ? $validated['amount'] : null
         ]);
 
         return response(new ExpenseResource($expense), 201);
@@ -71,6 +73,7 @@ class ExpensesController extends Controller
             'expenseCategoryId' => "exists:expense_categories,id,user_id,$userId",
             'expenseSubCategoryId' => "exists:expense_sub_categories,id,user_id,$userId",
             'note' => 'string|max:200',
+            'type' => 'string|in:debit,credit',
             'amount' => 'numeric'
         ]);
 
