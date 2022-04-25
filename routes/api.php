@@ -1,11 +1,11 @@
 <?php
 
-use App\Http\Controllers\PortfoliosController;
 use App\Http\Controllers\ExpensesController;
 use App\Http\Controllers\ExpenseCategoriesController;
 use App\Http\Controllers\ExpenseSubCategoriesController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\WidgetController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 /*
@@ -29,9 +29,9 @@ Route::post('/register', [AuthController::class, 'register']);
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('/user', UserController::class);
-    Route::resource('portfolio', PortfoliosController::class);
     Route::resource('expenses', ExpensesController::class);
     Route::resource('expense-categories', ExpenseCategoriesController::class);
     Route::resource('expense-sub-categories', ExpenseSubCategoriesController::class);
+    Route::get('widgets/{name}', [WidgetController::class, 'show'])->whereIn('name', config('dashboards.available_widgets'));
     Route::post('logout', [AuthController::class, 'logout']);
 });
