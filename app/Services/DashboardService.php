@@ -3,11 +3,12 @@ namespace App\Services;
 
 use Exception;
 use App\Models\Expense;
+use App\Models\ExpenseCategory;
 use Carbon\Carbon;
 
 class DashboardService {
 
-    const WIDGET_LAST_12_MONTHS_MONTLY_BALANCE = 'last-12-months-balance';
+    const WIDGET_LAST_12_MONTHS_MONTLY_BALANCE = 'last-12-months-monthly-balance';
 
     public function loadWidget(string $name) : array
     {
@@ -21,25 +22,29 @@ class DashboardService {
 
     private function loadLast12MonthsMonthlyBalance() : array
     {
+        $investmentsCategory = ExpenseCategory::queryUser(auth()->user()->id)
+            ->where('description', 'Investimentos')
+            ->first();
         $firstDay = Carbon::now()->subMonths(12)->startOfMonth();
         $expenses = Expense::queryUser(auth()->user()->id)
-            ->where('date', '>', $firstDay)
+            ->where('date', '>=', $firstDay)
+            ->where('expense_category_id', '<>', $investmentsCategory->id)
             ->get();
 
         $monthsOrdered = [
-            Carbon::now()->subMonths(12)->format('M'),
-            Carbon::now()->subMonths(11)->format('M'),
-            Carbon::now()->subMonths(10)->format('M'),
-            Carbon::now()->subMonths(9)->format('M'),
-            Carbon::now()->subMonths(8)->format('M'),
-            Carbon::now()->subMonths(7)->format('M'),
-            Carbon::now()->subMonths(6)->format('M'),
-            Carbon::now()->subMonths(5)->format('M'),
-            Carbon::now()->subMonths(4)->format('M'),
-            Carbon::now()->subMonths(3)->format('M'),
-            Carbon::now()->subMonths(2)->format('M'),
-            Carbon::now()->subMonths(1)->format('M'),
-            Carbon::now()->format('M'),
+            Carbon::now()->subMonths(12)->format('M Y'),
+            Carbon::now()->subMonths(11)->format('M Y'),
+            Carbon::now()->subMonths(10)->format('M Y'),
+            Carbon::now()->subMonths(9)->format('M Y'),
+            Carbon::now()->subMonths(8)->format('M Y'),
+            Carbon::now()->subMonths(7)->format('M Y'),
+            Carbon::now()->subMonths(6)->format('M Y'),
+            Carbon::now()->subMonths(5)->format('M Y'),
+            Carbon::now()->subMonths(4)->format('M Y'),
+            Carbon::now()->subMonths(3)->format('M Y'),
+            Carbon::now()->subMonths(2)->format('M Y'),
+            Carbon::now()->subMonths(1)->format('M Y'),
+            Carbon::now()->format('M Y'),
         ];
 
         $data = [];
@@ -51,9 +56,9 @@ class DashboardService {
         }
 
         foreach ($expenses as $expense) {
-            $month = (new Carbon($expense->date))->format('M');
+            $month = (new Carbon($expense->date))->format('M Y');
             $data[$month]['expenses'] += $expense->debit ?? 0;
-            $data[$month]['earnings'] += $expense->debit ?? 0;
+            $data[$month]['earnings'] += $expense->credit ?? 0;
         }
 
         return $data;
