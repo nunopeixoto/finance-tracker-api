@@ -44,6 +44,7 @@ class WidgetControllerTest extends TestCase
 
     public function test_widget_current_year_monthly_balance()
     {
+        $this->withoutExceptionHandling();
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
@@ -72,7 +73,7 @@ class WidgetControllerTest extends TestCase
         $totalCredit = 0;
         foreach ($expenses as $expense) {
             $totalDebit += $expense->debit ?? 0;
-            $totalCredit += $expense->debit ?? 0;
+            $totalCredit += $expense->credit ?? 0;
         }
 
         $response = $this->get('/api/widgets/' . DashboardService::WIDGET_LAST_12_MONTHS_MONTLY_BALANCE);
@@ -81,7 +82,7 @@ class WidgetControllerTest extends TestCase
 
         // Expects following format: [$month => ['expenses' => X, 'earnings' => Y]]
         $response->assertJsonFragment([
-            (new Carbon($expenses[0]->date))->format('M') => [
+            (new Carbon($expenses[0]->date))->format('M Y') => [
                 'expenses' => $totalDebit,
                 'earnings' => $totalCredit,
             ]
