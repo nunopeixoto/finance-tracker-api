@@ -5,16 +5,20 @@ use Exception;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 
 class DashboardService {
 
     const WIDGET_LAST_12_MONTHS_MONTLY_BALANCE = 'last-12-months-monthly-balance';
+    const WIDGET_TOP5_EXPENSE_CATEGORIES_ALL_TIME = 'top5-expense-categories-all-time';
 
     public function loadWidget(string $name) : array
     {
         switch ($name) {
             case self::WIDGET_LAST_12_MONTHS_MONTLY_BALANCE:
                 return $this->loadLast12MonthsMonthlyBalance();
+            case self::WIDGET_TOP5_EXPENSE_CATEGORIES_ALL_TIME:
+                    return $this->loadTop5ExpenseCategoriesAllTime();
             default:
                 throw new Exception('Trying to load unexpected widget: "' . $name) . '".';
         }
@@ -64,5 +68,37 @@ class DashboardService {
         }
 
         return $data;
+    }
+
+    private function loadTop5ExpenseCategoriesAllTime() : array
+    {
+        $hashMap = [];
+        Expense::queryUser(auth()->user()->id)
+            ->whereNull('credit')
+            ->chunk(100, function (Collection $expenses) use (&$hashMap) {
+                foreach ($expenses as $expense) {
+                    if (!isset($hashMap[$expense->expense_category_id])) {
+                        $hashMap[$expense->expense_category_id] = $expense->debit;
+                        continue;
+                    }
+                    $hashMap[$expense->expense_category_id] += $expense->debit;
+                }
+            })
+        ;
+
+        arsort($hashMap);
+        $top5 = array_slice($hashMap, 0, 5, true);
+        $categories = ExpenseCategory::queryUser(auth()->user()->id)
+            ->whereIn('id', array_keys($top5))
+            ->limit(5)
+            ->get();
+
+        $formatted = [];
+        foreach ($hashMap as $categoryId => $total) {
+            $description = $categories->firstWhere('id', $categoryId)->description;
+            $formatted[$description] = number_format($total, 2);
+        }
+
+        return $formatted;
     }
 }
