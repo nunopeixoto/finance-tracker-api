@@ -72,19 +72,27 @@ class DashboardService {
 
     private function loadTop5ExpenseCategoriesAllTime() : array
     {
+        $investmentsCategory = ExpenseCategory::queryUser(auth()->user()->id)
+            ->where('description', 'Investimentos')
+            ->first();
+
+        $query = Expense::queryUser(auth()->user()->id)
+            ->whereNull('credit');
+
+        if ($investmentsCategory !== null) {
+            $query->where('expense_category_id', '<>', $investmentsCategory->id);
+        }
+
         $hashMap = [];
-        Expense::queryUser(auth()->user()->id)
-            ->whereNull('credit')
-            ->chunk(100, function (Collection $expenses) use (&$hashMap) {
-                foreach ($expenses as $expense) {
-                    if (!isset($hashMap[$expense->expense_category_id])) {
-                        $hashMap[$expense->expense_category_id] = $expense->debit;
-                        continue;
-                    }
-                    $hashMap[$expense->expense_category_id] += $expense->debit;
+        $query->chunk(100, function (Collection $expenses) use (&$hashMap) {
+            foreach ($expenses as $expense) {
+                if (!isset($hashMap[$expense->expense_category_id])) {
+                    $hashMap[$expense->expense_category_id] = $expense->debit;
+                    continue;
                 }
-            })
-        ;
+                $hashMap[$expense->expense_category_id] += $expense->debit;
+            }
+        });
 
         arsort($hashMap);
         $top5 = array_slice($hashMap, 0, 5, true);
@@ -94,9 +102,9 @@ class DashboardService {
             ->get();
 
         $formatted = [];
-        foreach ($hashMap as $categoryId => $total) {
+        foreach ($top5 as $categoryId => $total) {
             $description = $categories->firstWhere('id', $categoryId)->description;
-            $formatted[$description] = number_format($total, 2);
+            $formatted[$description] = number_format($total, 2, '.', '');
         }
 
         return $formatted;
