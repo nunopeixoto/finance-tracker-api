@@ -30,8 +30,11 @@ class DashboardService {
             ->where('description', 'Investimentos')
             ->first();
         $firstDay = Carbon::now()->subMonths(12)->startOfMonth();
+        $lastDay = Carbon::now()->endOfMonth();
         $query = Expense::queryUser(auth()->user()->id)
-            ->where('date', '>=', $firstDay);
+            ->where('date', '>=', $firstDay)
+            ->where('date', '<', $lastDay)
+        ;
 
         if ($investmentsCategory !== null) {
             $query->where('expense_category_id', '<>', $investmentsCategory->id);
@@ -51,6 +54,7 @@ class DashboardService {
             Carbon::now()->subMonths(3)->format('M Y'),
             Carbon::now()->subMonths(2)->format('M Y'),
             Carbon::now()->subMonths(1)->format('M Y'),
+            Carbon::now()->format('M Y'),
         ];
 
         $data = [];

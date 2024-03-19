@@ -78,7 +78,7 @@ class WidgetControllerTest extends TestCase
 
         $response = $this->get('/api/widgets/' . DashboardService::WIDGET_LAST_12_MONTHS_MONTLY_BALANCE);
         $response->assertStatus(200);
-        $response->assertJsonCount(12);
+        $response->assertJsonCount(13);
 
         // Expects following format: [$month => ['expenses' => X, 'earnings' => Y]]
         $response->assertJsonFragment([
