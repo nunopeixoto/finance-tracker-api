@@ -29,7 +29,7 @@ class AuthControllerTest extends TestCase
             'password' => 'a cool password',
             'password_confirmation' => 'a cool password'
         ]);
-        $response->assertSessionHasErrors(['email']);
+        $response->assertJsonValidationErrors(['email']);
 
         // Password doesen't match
         $response = $this->post('/api/register', [
@@ -38,7 +38,7 @@ class AuthControllerTest extends TestCase
             'password' => 'a cool password',
             'password_confirmation' => 'another cool password'
         ]);
-        $response->assertSessionHasErrors(['password']);
+        $response->assertJsonValidationErrors(['password']);
 
         // Empty name
         $response = $this->post('/api/register', [
@@ -47,7 +47,7 @@ class AuthControllerTest extends TestCase
             'password' => 'a cool password',
             'password_confirmation' => 'a cool password'
         ]);
-        $response->assertSessionHasErrors(['name']);
+        $response->assertJsonValidationErrors(['name']);
     }
 
     public function test_login() : void
@@ -83,16 +83,14 @@ class AuthControllerTest extends TestCase
             'email' => '123',
             'password' => 'a cool password'
         ]);
-        $response->assertSessionHasErrors(['email']);
+        $response->assertJsonValidationErrors(['email']);
 
     }
 
     public function test_logout() : void
     {
         // Try to logout without login
-        $response = $this->post('/api/logout', [], [
-            'Accept' => 'application/json'
-        ]);
+        $response = $this->post('/api/logout', []);
         $response->assertStatus(401);
 
         $user = User::factory()->create();

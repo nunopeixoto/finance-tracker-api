@@ -12,15 +12,6 @@ use Laravel\Sanctum\Sanctum;
 class ExpenseCategoriesControllerTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function setUp() : void
-    {
-        parent::setUp();
-        $this->withHeaders([
-            'Accept' => 'application/json'
-        ]);
-    }
-
     public function test_index()
     {
         // No auth

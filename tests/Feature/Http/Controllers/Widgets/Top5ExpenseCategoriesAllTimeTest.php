@@ -10,29 +10,10 @@ use App\Models\ExpenseCategory;
 use App\Models\ExpenseSubCategory;
 use App\Services\DashboardService;
 use Laravel\Sanctum\Sanctum;
-use Carbon\Carbon;
 
-class WidgetControllerTest extends TestCase
+class Top5ExpenseCategoriesAllTimeTest extends TestCase
 {
     use RefreshDatabase;
-
-    public function test_requires_auth()
-    {
-        $response = $this->get('/api/widgets/' . DashboardService::WIDGET_LAST_12_MONTHS_MONTLY_BALANCE);
-        $response->assertStatus(401);
-    }
-
-    public function test_widget_name_validation()
-    {
-        $user = User::factory()->create();
-        Sanctum::actingAs($user);
-
-        $response = $this->get('/api/widgets/random-name');
-        $response->assertStatus(404);
-
-        $response = $this->get('/api/widgets/');
-        $response->assertStatus(404);
-    }
 
     public function test_widget_top5_expense_categories_all_time()
     {
