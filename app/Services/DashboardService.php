@@ -11,16 +11,19 @@ class DashboardService {
 
     const WIDGET_LAST_12_MONTHS_MONTLY_BALANCE = 'last-12-months-monthly-balance';
     const WIDGET_TOP5_EXPENSE_CATEGORIES_ALL_TIME = 'top5-expense-categories-all-time';
+    const WIDGET_EXPENSE_EVOLUTION_PER_CATEGORY = 'expense-evolution-per-category';
 
-    public function loadWidget(string $name) : array
+    public function loadWidget(string $name, array $queryParams) : array
     {
         switch ($name) {
             case self::WIDGET_LAST_12_MONTHS_MONTLY_BALANCE:
                 return $this->loadLast12MonthsMonthlyBalance();
             case self::WIDGET_TOP5_EXPENSE_CATEGORIES_ALL_TIME:
                     return $this->loadTop5ExpenseCategoriesAllTime();
+            case self::WIDGET_EXPENSE_EVOLUTION_PER_CATEGORY:
+                    return $this->loadExpenseEvolutionPerCategory($queryParams);
             default:
-                throw new Exception('Trying to load unexpected widget: "' . $name) . '".';
+                throw new Exception('Trying to load unexpected widget: "' . $name);
         }
     }
 
@@ -112,5 +115,37 @@ class DashboardService {
         }
 
         return $formatted;
+    }
+
+    private function loadExpenseEvolutionPerCategory(array $queryParams) : array
+    {
+        if (!isset($queryParams['expenseCategoryId'])) {
+            abort(422);
+        }
+
+        $expenseCategoryId = $queryParams['expenseCategoryId'];
+        $category = ExpenseCategory::queryUser(auth()->user()->id)
+            ->find($expenseCategoryId);
+
+        if ($category === null) {
+            abort(422);
+        }
+
+        $hashMap = [];
+        Expense::queryCategory($category->id)->chunk(1000, function (Collection $expenses) use (&$hashMap) {
+            foreach ($expenses as $expense) {
+                if ($expense->debit === null) {
+                    continue;
+                }
+                $monthYear = Carbon::parse($expense->date)->format('M Y');
+                if (!isset($hashMap[$monthYear])) {
+                    $hashMap[$monthYear] = $expense->debit;
+                    continue;
+                }
+                $hashMap[$monthYear] += $expense->debit;
+            }
+        });
+
+        return $hashMap;
     }
 }

@@ -36,4 +36,8 @@ class ExpenseCategory extends Model
     {
         return $query->where('user_id', $userId);
     }
+    public function scopeQueryDescription(Builder $query, string $description) : Builder
+    {
+        return $query->where('description', $description);
+    }
 }
