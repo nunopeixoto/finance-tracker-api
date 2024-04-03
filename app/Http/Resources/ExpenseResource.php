@@ -18,8 +18,8 @@ class ExpenseResource extends JsonResource
             'id' => $this->id,
             'date' => $this->date,
             'description' => $this->description,
-            'category' => $this->category,
-            'subCategory' => $this->subCategory,
+            'expenseCategory' => new ExpenseCategoryResource($this->whenLoaded('expenseCategory')),
+            'expenseSubCategory' => new ExpenseCategoryResource($this->whenLoaded('expenseSubCategory')),
             'type' => $this->debit ?  'debit' : 'credit',
             'amount' => $this->debit ? (float) number_format($this->debit, 2) : (float) number_format($this->credit, 2),
             'note' => $this->note

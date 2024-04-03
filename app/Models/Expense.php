@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Expense extends Model
 {
@@ -31,12 +32,12 @@ class Expense extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function category()
+    public function expenseCategory() : HasOne
     {
         return $this->hasOne(ExpenseCategory::class, 'id', 'expense_category_id');
     }
 
-    public function subCategory()
+    public function expenseSubCategory()
     {
         return $this->hasOne(ExpenseSubCategory::class, 'id', 'expense_sub_category_id');
     }
@@ -44,5 +45,10 @@ class Expense extends Model
     public function scopeQueryUser(Builder $query, int $userId) : Builder
     {
         return $query->where('user_id', $userId);
+    }
+
+    public function scopeQueryCategory(Builder $query, int $categoryId) : Builder
+    {
+        return $query->where('expense_category_id', $categoryId);
     }
 }

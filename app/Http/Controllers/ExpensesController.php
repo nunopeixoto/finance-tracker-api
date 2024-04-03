@@ -10,7 +10,7 @@ class ExpensesController extends Controller
 {
     public function index()
     {
-        $expenses = Expense::with(['category', 'subCategory'])
+        $expenses = Expense::with(['expenseCategory', 'expenseSubCategory'])
             ->queryUser(auth()->user()->id)
             ->get();
 

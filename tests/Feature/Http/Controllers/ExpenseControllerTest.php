@@ -55,15 +55,13 @@ class ExpenseControllerTest extends TestCase
                 'id' => $expense->id,
                 'date' => $expense->date->format('Y-m-d H:i:s'),
                 'description' => $expense->description,
-                'category' => [
-                    'id' => $category->id,
-                    'user_id' => $category->user_id,
-                    'description' => $category->description
+                'expenseCategory' => [
+                    'id' =>       $expense->expense_category_id,
+                    'description' =>       $expense->expenseCategory->description,
                 ],
-                'subCategory' => [
-                    'id' => $subCategory->id,
-                    'user_id' => $subCategory->user_id,
-                    'description' => $subCategory->description
+                'expenseSubCategory' => [
+                    'id' =>       $expense->expense_sub_category_id,
+                    'description' =>       $expense->expenseSubCategory->description,
                 ],
                 'note' => $expense->note,
                 'type' => $expense->debit ? 'debit' : 'credit',
@@ -139,7 +137,7 @@ class ExpenseControllerTest extends TestCase
         ;
 
         // Not found
-        $response = $this->get("/api/expenses/++$expense->id", [
+        $response = $this->get("/api/expenses/999", [
             'description' => 'mycategory'
         ]);
         $response->assertStatus(404);
@@ -158,16 +156,6 @@ class ExpenseControllerTest extends TestCase
             'id' => $expense->id,
             'date' => $expense->date->format('Y-m-d H:i:s'),
             'description' => $expense->description,
-            'category' => [
-                'id' => $category->id,
-                'user_id' => $category->user_id,
-                'description' => $category->description
-            ],
-            'subCategory' => [
-                'id' => $subCategory->id,
-                'user_id' => $subCategory->user_id,
-                'description' => $subCategory->description
-            ],
             'note' => $expense->note,
             'type' => $expense->debit ? 'debit' : 'credit',
             'amount' => $expense->debit ? (float) number_format($expense->debit, 2) : (float) number_format($expense->credit, 2),

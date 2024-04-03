@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Expense;
+use App\Models\ExpenseCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ExpenseFactory extends Factory
@@ -27,7 +28,10 @@ class ExpenseFactory extends Factory
             'date' => $this->faker->dateTime(),
             'note' => $this->faker->name(),
             'debit' => $rand ?  $this->faker->randomFloat(2, 0, 10) : null,
-            'credit' =>  $rand ? null : $this->faker->randomFloat(2, 0, 10)
+            'credit' =>  $rand ? null : $this->faker->randomFloat(2, 0, 10),
+            'expense_category_id' => function () {
+                return ExpenseCategory::factory()->create()->id;
+            }
         ];
     }
 }
